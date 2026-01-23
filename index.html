@@ -18,27 +18,13 @@
     <div id="clock"></div>
     <input type="number" id="inputField" placeholder="Введи число" />
     <br>
-    <button onclick="processNumber()">Обробити</button>
+    <button onclick="processNumberAndGo()">Обробити та перейти</button>
     <div id="output"></div>
 
     <script>
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerHTML = now.toLocaleString('uk-UA', { 
-                hour: '2-digit', minute: '2-digit', second: '2-digit',
-                day: '2-digit', month: '2-digit', year: 'numeric'
-            });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        function processNumber() {
-            const num = parseFloat(document.getElementById('inputField').value);
-            const output = document.getElementById('output');
-            if (isNaN(num)) {
-                output.innerHTML = 'Будь ласка, введи валідне число!';
-            } else {
-                output.innerHTML = `Ти ввів: ${num}. Квадрат: ${num * num}.`;
+                   setTimeout(() => {
+                    window.location.href = 'bilet.html';  // Перехід на іншу сторінку
+                }, 2000);
             }
         }
     </script>
