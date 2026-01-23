@@ -1,96 +1,41 @@
-Ось точна HTML-сторінка в стилі твого квитка ZTM Kielce (білий фон, шрифти iOS, кольори, кнопка QR, деталі). Збережи як index.html і завантаж на GitHub/Netlify.
-​
-
-xml
 <!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilet ZTM</title>
+    <title>Bilet ZTM Kielce</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .ticket {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-            width: 320px;
-            padding: 24px;
-            position: relative;
-            overflow: hidden;
-        }
-        .ticket::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
-        }
-        .type { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 8px; }
-        .price { font-size: 28px; font-weight: bold; color: #2c3e50; margin: 12px 0; }
-        .city { font-size: 16px; color: #7f8c8d; margin-bottom: 16px; }
-        .qr-placeholder {
-            width: 120px;
-            height: 120px;
-            background: #ecf0f1;
-            border: 2px dashed #bdc3c7;
-            border-radius: 8px;
-            margin: 24px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #95a5a6;
-        }
-        .purchase { 
-            background: #e74c3c; 
-            color: white; 
-            border: none; 
-            padding: 12px 24px; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            margin-top: 16px;
-        }
-        .purchase:hover { background: #c0392b; }
-        .details { font-size: 14px; color: #7f8c8d; margin-top: 16px; text-align: center; }
-        .zone { font-size: 16px; margin: 12px 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: white; text-align: center; }
+        .ticket { max-width: 300px; margin: 0 auto; border: 2px solid #007AFF; border-radius: 10px; padding: 20px; background: linear-gradient(white, #f0f8ff); }
+        .qr { width: 100px; height: 100px; background: #ddd; margin: 10px auto; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #666; }
+        .price { font-size: 32px; font-weight: bold; color: #007AFF; margin: 10px 0; }
+        .time { font-size: 18px; color: #333; }
+        button { background: #007AFF; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #0056b3; }
     </style>
 </head>
 <body>
     <div class="ticket">
-        <div class="type">Normalny jednorazowy</div>
-        <div class="price">4,40 PLN</div>
-        <div class="city">Kielce</div>
-        <div class="zone">58 x 3 c</div>
-        
-        <div class="qr-placeholder">QR Code</div>
-        
-        <button class="purchase">Powieksz kod QR</button>
-        <div class="details">
-            Normalny, jednorazowy<br>
-            strefa mieska<br>
-            2026.01.23 07:33-36
-        </div>
+        <div class="qr">QR</div>
+        <div class="price" id="price">4.40 zł</div>
+        <div>Normalny, jednorazowy</div>
+        <div>strefa miejska</div>
+        <div class="time" id="currentTime"></div>
+        <button onclick="window.location.href='index.html'">Powrót</button>
     </div>
 
     <script>
-        document.querySelector('.purchase').onclick = () => {
-            alert('QR код збільшено! (Тут можна додати реальний QR)');
-        };
+        // Читаємо ціну з URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const price = urlParams.get('price') || '4.40';
+        document.getElementById('price').innerHTML = price + ' zł';
+
+        // Поточний час
+        const now = new Date();
+        document.getElementById('currentTime').innerHTML = now.toLocaleString('pl-PL', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
     </script>
 </body>
 </html>
