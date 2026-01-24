@@ -2,66 +2,61 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilet ZTM Kielce</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bilet ZTM Kielce</title>
 
-    <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            margin: 0;
-            padding: 0;
-            background-image: url('ztm.png'); /* ФОН */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 200vh;
-            background-attachment: fixed;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
+  <style>
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      margin: 0;
+      padding: 0;
+      background-image: url('ztm.png'); /* ФОН */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 200vh;
+      background-attachment: fixed;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
 
-        /* Контейнер для логотипу */
-        .logo-stage {
-            position: relative;          /* завжди видно */
-            top: 40px;                /* відступ зверху */
-            left: 20px;
-            width: 670px;
-            height: 47px;
-            pointer-events: none;     /* не заважає клікам */
-            z-index: 10;
-            overflow: hidden;
-        }
+    /* Контейнер 670×47 */
+    .logo-stage {
+      position: relative;
+      top: 40px;
+      left: 20px;
+      width: 670px;
+      height: 47px;        /* = висота логотипу */
+      pointer-events: none;
+      z-index: 10;
+      overflow: hidden;
+    }
 
-        /* Логотип */
-        .logo-move {
-            position: absolute;
-            height: 70px;             /* розмір логотипу */
-            animation: slide 6s linear infinite;
-        }
+    /* Логотип 47px заввишки */
+    .logo-move {
+      position: absolute;
+      top: 50%;
+      height: 47px;        /* фіксована висота логотипу */
+      transform: translate(-100%, -50%); /* старт за межами зліва + центрування по Y */
+      animation: slide 6s linear infinite;
+      will-change: transform;
+    }
 
-        /* Анімація зліва направо */
-        keyframes slide {
-            from {
-                transform: translateX(-100%);
-            }
-            to {
-                transform: translateX(100vw);
-            }
-        }
-    </style>
+    /* Рух у межах контейнера (від -100% ширини логотипу до +100% ширини контейнера) */
+    @keyframes slide {
+      from { transform: translate(-100%, -50%); }
+      to   { transform: translate(100%, -50%); }
+    }
+  </style>
 </head>
 
 <body>
 
-    <!-- РУХОМИЙ ЛОГОТИП -->
-    <div class="logo-stage">
-        <img src="logo_ztm.png" class="logo-move" alt="ZTM logo">
-    </div>
+  <!-- РУХОМИЙ ЛОГОТИП -->
+  <div class="logo-stage">
+    <img src="logo_ztm.png" class="logo-move" alt="ZTM logo">
+  </div>
 
 </body>
 </html>
-
-
-
-
