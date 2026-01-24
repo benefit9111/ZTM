@@ -39,7 +39,7 @@
       position: absolute;  /* ← було relative */
       top: 28%;            /* ← тепер рахується від ВИСОТИ фону всередині .ticket */
       left: 5%;
-      width: 89,5%;
+      width: 89.5%;
       height: 47px;
       overflow: hidden;    /* обрізаємо за межами сцени */
       pointer-events: none;
@@ -51,7 +51,7 @@
       top: 50%;
       display: flex;
       align-items: center;
-      gap: 100%;                 /* ← було без одиниці */
+      gap: 0;                 /* ← було без одиниці */
       transform: translateY(-50%); 
       animation: marquee 10s linear infinite;
       animation-direction: reverse;  /* ← рух зліва → направо */
@@ -90,6 +90,7 @@
 
 </body>
 </html>
+
 
 
 
