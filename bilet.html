@@ -3,7 +3,7 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bilet ZTM Kielce</title>
   <style>
     html, body {
@@ -22,52 +22,53 @@
 
     /* Контейнер сторінки-квитка */
     .ticket {
-      position: relative;      /* важливо: базовий контекст для абсолютного позиціювання .logo-stage */
+      position: relative;      /* базовий контекст для абсолютного позиціювання .logo-stage */
       display: inline-block;
       line-height: 0;
     }
 
-    /* Фон як <img> (у твоєму варіанті тягнемо на 100% ширини контейнера) */
+    /* Фон як <img> (тягнеться на 100% ширини контейнера) */
     .ticket img.bg {
       display: block;
       width: 100%;
       height: auto;
     }
 
-    /* СЦЕНА анімації: кладемо поверх фонового зображення, позиціюємо у % від висоти фону */
+    /* СЦЕНА анімації: поверх фону, позиції у % від фону */
     .logo-stage {
-      position: absolute;  /* ← було relative */
-      top: 28%;            /* ← тепер рахується від ВИСОТИ фону всередині .ticket */
+      position: absolute;
+      top: 28%;            /* позиція по вертикалі від висоти фону */
       left: 4.5%;
       width: 89.5%;
       height: 47px;
       overflow: hidden;    /* обрізаємо за межами сцени */
       pointer-events: none;
+      z-index: 1;
     }
 
-    /* Стрічка з двох однакових логотипів підряд (для безшовної прокрутки) */
+    /* СТРІЧКА (дві копії логотипу підряд для безшовності) */
     .logo-track {
       position: absolute;
       top: 50%;
       display: flex;
       align-items: center;
-      gap: 210px;                 /* ← було без одиниці */
-      transform: translateY(-50%); 
-      animation: marquee 10s linear infinite;
-     /* animation-direction: reverse;   ← рух зліва → направо */
+      gap: 0px;                                /* за потреби можеш поставити, наприклад, 90px */
+      transform: translateY(-50%);             /* центрування по Y */
+      animation: marqueeCycle var(--duration, 10s) linear infinite;
+      animation-direction: reverse;            /* зліва → направо */
       will-change: transform;
     }
 
     .logo-track img {
-      height: 37px;        /* твоя висота лого */
+      height: 37px;         /* висота логотипу */
       flex: 0 0 auto;
       display: block;
     }
 
-    /* Базовий marquee (вліво). Ми розвертаємо його через animation-direction: reverse */
-    @keyframes marquee {
-      from { transform: translate(-10%,   -50%); }
-      to   { transform: translate(100%, -50%); }
+    /* Анімація: зсув рівно на ширину одного лого + gap (встановлюється з JS у --cycle) */
+    @keyframes marqueeCycle {
+      from { transform: translate(0, -50%); }
+      to   { transform: translate(calc(var(--cycle, 0px) * -1), -50%); }
     }
   </style>
 </head>
@@ -88,22 +89,34 @@
     </div>
   </div>
 
+  <!-- Скрипт обчислює точний «цикл» прокрутки: ширина одного лого + gap -->
+  <script>
+    function setMarqueeCycle() {
+      const track = document.querySelector('.logo-track');
+      if (!track) return;
+
+      const firstImg = track.querySelector('img');
+      if (!firstImg) return;
+
+      // Поточні стилі (щоб взяти фактичний gap)
+      const st   = getComputedStyle(track);
+      const gap  = parseFloat(st.columnGap || st.gap) || 0;
+
+      // Фактична ширина першого лого (з урахуванням поточного рендеру)
+      const w = firstImg.getBoundingClientRect().width;
+
+      // Цикл = ширина одного лого + gap
+      const cycle = Math.ceil(w + gap);
+
+      // Прокидаємо в CSS як змінну
+      track.style.setProperty('--cycle', cycle + 'px');
+    }
+
+    // Рахуємо після повного завантаження (картинки теж), та при зміні розміру
+    window.addEventListener('load', () => {
+      setMarqueeCycle();
+      window.addEventListener('resize', setMarqueeCycle);
+    });
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
