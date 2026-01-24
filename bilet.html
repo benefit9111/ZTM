@@ -11,7 +11,7 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
       margin: 0;
       padding: 0;
-      background-image: url('ztm.png'); /* ФОН */
+      background-image: url('ztm.png'); /* фон */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -21,42 +21,46 @@
       overflow-x: hidden;
     }
 
-    /* Контейнер 670×47 */
+    /* Відстань від верху задаємо margin-top у контейнера */
     .logo-stage {
-      position: relative;
-      top: 40px;
-      left: 20px;
-      width: 670px;
-      height: 47px;        /* = висота логотипу */
-      pointer-events: none;
+      position: relative;     /* у звичайному потоці, не фіксований */
+      margin-top: 80px;       /* ← ЗМІНИ тут потрібну відстань від верху */
+      margin-left: 20px;      /* якщо треба зсунути вправо */
+      width: 670px;           /* твоя ширина сцени */
+      height: 47px;           /* = висота логотипу */
+      overflow: hidden;       /* обрізаємо зайве під час руху */
       z-index: 10;
-      overflow: hidden;
+      pointer-events: none;   /* не блокує кліки по фону */
+      /* опціонально: фоновий колір або тінь для контрасту
+      background: rgba(255,255,255,0.0);
+      */
     }
 
-    /* Логотип 47px заввишки */
     .logo-move {
       position: absolute;
       top: 50%;
-      height: 47px;        /* фіксована висота логотипу */
-      transform: translate(-100%, -50%); /* старт за межами зліва + центрування по Y */
-      animation: slide 6s linear infinite;
+      height: 47px;                         /* фіксована висота логотипу */
+      transform: translate(-100%, -50%);    /* старт поза лівим краєм + центрування по Y */
+      animation: slide 6s linear infinite;  /* швидкість руху */
       will-change: transform;
     }
 
-    /* Рух у межах контейнера (від -100% ширини логотипу до +100% ширини контейнера) */
+    /* Рух у межах контейнера 670px */
     @keyframes slide {
       from { transform: translate(-100%, -50%); }
-      to   { transform: translate(100%, -50%); }
+      to   { transform: translate(100%,  -50%); }
     }
   </style>
 </head>
-
 <body>
 
-  <!-- РУХОМИЙ ЛОГОТИП -->
+  <!-- Рухомий логотип у потоці: при скролі просто поїде догори та сховається -->
   <div class="logo-stage">
     <img src="logo_ztm.png" class="logo-move" alt="ZTM logo">
   </div>
+
+  <!-- Додатковий контент, щоб було куди скролити -->
+  <div style="height: 180vh"></div>
 
 </body>
 </html>
