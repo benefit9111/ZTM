@@ -38,8 +38,8 @@
     .logo-stage {
       position: absolute;  /* ← було relative */
       top: 27%;            /* ← тепер рахується від ВИСОТИ фону всередині .ticket */
-      left: 0;
-      width: 100%;
+      left: 40px;
+      width: 90%;
       height: 47px;
       overflow: hidden;    /* обрізаємо за межами сцени */
       pointer-events: none;
@@ -51,7 +51,7 @@
       top: 50%;
       display: flex;
       align-items: center;
-      gap: 90px;                 /* ← було без одиниці */
+      gap: 600px;                 /* ← було без одиниці */
       transform: translateY(-50%); 
       animation: marquee 6s linear infinite;
       animation-direction: reverse;  /* ← рух зліва → направо */
@@ -90,3 +90,4 @@
 
 </body>
 </html>
+
