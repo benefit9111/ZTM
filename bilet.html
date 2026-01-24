@@ -2,16 +2,16 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
   <title>Bilet ZTM Kielce</title>
-
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      overflow-x: hidden; /* ❗️заборона горизонтального скролу */
-      background: #eaeaea;
+      overflow-x: hidden;      /* без горизонтального скролу */
+      background: #eaeaea;     /* фон навколо квитка */
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     /* Центруємо макет на екрані */
@@ -20,27 +20,28 @@
       justify-content: center;
     }
 
-    /* Сторінка = картинка (ширина невідома заздалегідь) */
+    /* Контейнер сторінки-квитка "під розмір зображення" */
     .ticket {
       position: relative;
-      width: 100%;           /* ✅ ПРОЦЕНТИ */
-      max-width: 100%;       /* не ширша за екран */
+      display: inline-block;   /* ширина = по контенту (фон-картинка) */
+      line-height: 0;          /* прибрати можливі проміжки */
     }
 
-    /* Фон */
+    /* Фон як <img> у натуральному розмірі (без width:100%) */
     .ticket img.bg {
-      display: block;        /* прибирає зайві відступи */
-      width: 100%;           /* ✅ БЕЗ ЗНАННЯ px */
-      height: auto;          /* зберігає пропорції */
+      display: block;          /* без нижнього inline-gap */
+      height: auto;            /* зберігає пропорції */
+      /* width НЕ задаємо -> буде натуральна ширина файлу */
     }
 
     /* Анімація поверх фону */
     .logo-stage {
       position: absolute;
-      top: 12%;              /* ✅ ВІДСОТКИ ВІД ВИСОТИ ФОНУ */
+      /* !!! ці значення підлаштовуй під свій макет */
+      top: 12%;                /* відстань зверху ВІД ВИСОТИ фону */
       left: 0;
-      width: 100%;           /* ✅ ВІДСОТКИ */
-      height: 47px;
+      width: 100%;             /* ширина сцени = ширині фонового зображення */
+      height: 47px;            /* висота лого */
       overflow: hidden;
       pointer-events: none;
     }
@@ -64,17 +65,18 @@
 
   <div class="page">
     <div class="ticket">
+      <!-- ФОН (як зображення, а не текст) -->
+      <img src="ztm.png" alt="tło biletu" class="bg">
 
-      <!-- ФОН БЕЗ МАСШТАБУВАННЯ -->
-      ztm.png
-
-      <!-- АНІМАЦІЯ -->
+      <!-- АНІМАЦІЯ ЛОГОТИПУ -->
       <div class="logo-stage">
-        logo_ztm.png
+        <img src="logo_ztm.png" alt="logo ZTM" class="logo-move">
       </div>
-
     </div>
   </div>
+
+  <!-- Додай нижче контент/висоту, якщо необхідно прокручування вниз -->
+  <!-- <div style="height: 150vh"></div> -->
 
 </body>
 </html>
