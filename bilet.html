@@ -20,81 +20,73 @@
       justify-content: center;
     }
 
-    /* Контейнер сторінки-квитка "під розмір зображення" */
+    /* Контейнер сторінки-квитка */
     .ticket {
-      position: relative;
-      display: inline-block;   /* ширина = по контенту (фон-картинка) */
-      line-height: 0;          /* прибрати можливі проміжки */
+      position: relative;      /* важливо: базовий контекст для абсолютного позиціювання .logo-stage */
+      display: inline-block;
+      line-height: 0;
     }
 
-    /* Фон як <img> у натуральному розмірі (без width:100%) */
+    /* Фон як <img> (у твоєму варіанті тягнемо на 100% ширини контейнера) */
     .ticket img.bg {
-      display: block;          /* без нижнього inline-gap */
-      height: auto;            /* зберігає пропорції */
-     width: 100%;
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
+    /* СЦЕНА анімації: кладемо поверх фонового зображення, позиціюємо у % від висоти фону */
+    .logo-stage {
+      position: absolute;  /* ← було relative */
+      top: 27%;            /* ← тепер рахується від ВИСОТИ фону всередині .ticket */
+      left: 0;
+      width: 100%;
+      height: 47px;
+      overflow: hidden;    /* обрізаємо за межами сцени */
+      pointer-events: none;
+    }
 
+    /* Стрічка з двох однакових логотипів підряд (для безшовної прокрутки) */
+    .logo-track {
+      position: absolute;
+      top: 50%;
+      display: flex;
+      align-items: center;
+      gap: 90px;                 /* ← було без одиниці */
+      transform: translateY(-50%); 
+      animation: marquee 6s linear infinite;
+      animation-direction: reverse;  /* ← рух зліва → направо */
+      will-change: transform;
+    }
 
-.logo-stage {
-  position: relative;
-  width: 100%;        /* або твоя фіксована ширина (наприклад, 670px) */
-  height: 47px;
-  overflow: hidden;   /* щоб не видно було зайвого */
-  pointer-events: none;
-}
+    .logo-track img {
+      height: 37px;        /* твоя висота лого */
+      flex: 0 0 auto;
+      display: block;
+    }
 
-/* Стрічка з двох однакових логотипів підряд */
-.logo-track {
-  position: absolute;
-  top: 27%;
-  display: flex;
-  align-items: center;
-  gap: 90;                /* без проміжків */
-  transform: translateY(-50%); /* вертикальне центрування */
-  animation: marquee 6s linear infinite; /* безшовна прокрутка */
-  will-change: transform;
-}
-
-.logo-track img {
-  height: 37px;
-  flex: 0 0 auto;      /* не стискати, не розтягувати */
-}
-
-/* Рухаєм “стрічку” рівно на ширину одного лого: 0 → -100% */
-@keyframes marquee {
-  from { transform: translate(0, -50%); }
-  to   { transform: translate(-100%, -50%); }
-}
-
-   </style>
+    /* Базовий marquee (вліво). Ми розвертаємо його через animation-direction: reverse */
+    @keyframes marquee {
+      from { transform: translate(0,   -50%); }
+      to   { transform: translate(-100%, -50%); }
+    }
+  </style>
 </head>
 <body>
 
   <div class="page">
     <div class="ticket">
-      <!-- ФОН (як зображення, а не текст) -->
+      <!-- ФОН -->
       <img src="ztm.png" alt="tło biletu" class="bg">
 
-      <!-- АНІМАЦІЯ ЛОГОТИПУ -->
+      <!-- АНІМАЦІЯ ЛОГОТИПУ (безшовно, зліва → направо) -->
       <div class="logo-stage">
-      <div class="logo-track">
-      <img src="logo_ztm.png" alt="logo" />
-      <img src="logo_ztm.png" alt="logo" />
+        <div class="logo-track">
+          <img src="logo_ztm.png" alt="logo" />
+          <img src="logo_ztm.png" alt="logo" />
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-
-  <!-- Додай нижче контент/висоту, якщо необхідно прокручування вниз -->
-  <!-- <div style="height: 150vh"></div> -->
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
