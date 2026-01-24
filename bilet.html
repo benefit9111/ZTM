@@ -33,7 +33,7 @@
       height: auto;            /* зберігає пропорції */
      width: 100%;
     }
-
+/*
     /* Анімація поверх фону */
     .logo-stage {
       position: absolute;
@@ -59,7 +59,41 @@
       from { transform: translate(-120%, -50%); }
       to   { transform: translate(180%,  -50%); }
     }
-  </style>
+*/
+
+
+.logo-stage {
+  position: relative;
+  width: 100%;        /* або твоя фіксована ширина (наприклад, 670px) */
+  height: 47px;
+  overflow: hidden;   /* щоб не видно було зайвого */
+  pointer-events: none;
+}
+
+/* Стрічка з двох однакових логотипів підряд */
+.logo-track {
+  position: absolute;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 0;                /* без проміжків */
+  transform: translateY(-50%); /* вертикальне центрування */
+  animation: marquee 6s linear infinite; /* безшовна прокрутка */
+  will-change: transform;
+}
+
+.logo-track img {
+  height: 47px;
+  flex: 0 0 auto;      /* не стискати, не розтягувати */
+}
+
+/* Рухаєм “стрічку” рівно на ширину одного лого: 0 → -100% */
+@keyframes marquee {
+  from { transform: translate(0, -50%); }
+  to   { transform: translate(-100%, -50%); }
+}
+
+   </style>
 </head>
 <body>
 
@@ -70,16 +104,18 @@
 
       <!-- АНІМАЦІЯ ЛОГОТИПУ -->
       <div class="logo-stage">
-        <img src="logo_ztm.png" alt="logo ZTM" class="logo-move">
-      </div>
-    </div>
+      <div class="logo-track">
+      <img src="logo_ztm.png" alt="logo" />
+      <img src="logo_ztm.png" alt="logo" />
   </div>
+</div>
 
   <!-- Додай нижче контент/висоту, якщо необхідно прокручування вниз -->
   <!-- <div style="height: 150vh"></div> -->
 
 </body>
 </html>
+
 
 
 
