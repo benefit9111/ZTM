@@ -2,66 +2,86 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Bilet ZTM Kielce</title>
 
   <style>
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    /* 1) Глобально вимикаємо горизонтальний скрол */
+    html, body {
       margin: 0;
       padding: 0;
-      background-image: url('ztm.png'); /* фон */
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      min-height: 200vh;
-      background-attachment: fixed;
-      overflow-y: 200vh;
-      overflow-x: hidden;
+      overflow-x: hidden;  /* ← важливо */
     }
 
-    /* Відстань від верху задаємо margin-top у контейнера */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 200vh;     /* тільки вертикальна висота для скролу */
+      overflow-y: auto;
+      /* Фон прибрали з body, робимо окремим шаром .bg (нижче) */
+    }
+
+    /* 2) Фон як окремий фіксований шар — НЕ створює горизонтальний скрол */
+    .bg {
+      position: fixed;
+      inset: 0;                           /* те саме, що top:0; right:0; bottom:0; left:0 */
+      background: url('ztm.png') top center / contain no-repeat;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* 3) Контейнер для логотипу в потоці — відступ від верху */
     .logo-stage {
-      position: relative;     /* у звичайному потоці, не фіксований */
-      margin-top: 80px;       /* ← ЗМІНИ тут потрібну відстань від верху */
-      margin-left: 20px;      /* якщо треба зсунути вправо */
-      width: 670px;           /* твоя ширина сцени */
-      height: 47px;           /* = висота логотипу */
-      overflow: hidden;       /* обрізаємо зайве під час руху */
+      position: relative;   /* в нормальному потоці, ховається при скролі вниз */
+      margin-top: 80px;     /* ← регулюй відстань від верху */
+      margin-left: 20px;    /* зсув вправо (необов'язково) */
+      width: 670px;         /* ширина "сцени" */
+      height: 47px;         /* = висоті логотипу */
+      overflow: hidden;     /* обрізає логотип по краях сцени (без впливу на сторінку) */
       z-index: 10;
-      pointer-events: none;   /* не блокує кліки по фону */
-      /* опціонально: фоновий колір або тінь для контрасту
-      background: rgba(255,255,255,0.0);
-      */
+      pointer-events: none; /* щоб не заважав клікам по фону */
+      box-sizing: border-box;
     }
 
+    /* 4) Сам логотип (47px) — рух усередині сцени */
     .logo-move {
       position: absolute;
       top: 50%;
-      height: 47px;                         /* фіксована висота логотипу */
-      transform: translate(-100%, -50%);    /* старт поза лівим краєм + центрування по Y */
-      animation: slide 6s linear infinite;  /* швидкість руху */
+      height: 47px;                         /* фіксуємо потрібну висоту */
+      transform: translate(-110%, -50%);    /* старт трохи за лівим краєм */
+      animation: slide 6s linear infinite;  /* швидкість/цикл */
       will-change: transform;
+      display: block;
     }
 
-    /* Рух у межах контейнера 670px */
+    /* 5) Анімація в межах сцени 670px */
     @keyframes slide {
-      from { transform: translate(-100%, -50%); }
-      to   { transform: translate(100%,  -50%); }
+      0%   { transform: translate(-110%, -50%); } /* трохи далі зліва — щоб не "підрізало" */
+      100% { transform: translate(110%,  -50%); } /* трохи далі справа */
+    }
+
+    /* Опційно: адаптація під вузькі екрани — щоб сцена не виходила за межі */
+    @media (max-width: 700px) {
+      .logo-stage {
+        margin-left: 10px;
+        width: calc(100% - 20px); /* поважає поля і не створює скрол */
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Рухомий логотип у потоці: при скролі просто поїде догори та сховається -->
+  <!-- Фоновий шар -->
+  <div class="bg"></div>
+
+  <!-- Рухомий логотип -->
   <div class="logo-stage">
-    <img src="logo_ztm.png" class="logo-move" alt="ZTM logo">
+    <img src="logo_ztm.png" alt="ZTM logo" class="logo-move" />
   </div>
 
-  <!-- Додатковий контент, щоб було куди скролити -->
-  <div style="height: 180vh"></div>
+  <!-- Щоб був вертикальний скрол і було видно, що блок зникає при прокрутці -->
+  <div style="height: 180vh;"></div>
 
 </body>
 </html>
-
+``
