@@ -163,7 +163,7 @@
           data-fw="700"
         >Status: —</div>
 
-        <!-- Odliczanie -->
+        <!-- Odliczanie do końca -->
         <div
           class="text-block"
           id="tb-countdown"
@@ -172,13 +172,24 @@
           data-fs="2.2vw"
           data-fw="800"
         >Pozostało: —</div>
+
+        <!-- === NOWE: Czas od skasowania (licznik w górę) === -->
+        <div
+          class="text-block"
+          id="tb-elapsed"
+          data-x="8%" data-y="32%"
+          data-align="left"
+          data-fs="1.6vw"
+          data-color="#111"
+          data-fw="700"
+        >Minęło: —</div>
       </div>
       <!-- === /DODANE === -->
 
     </div>
   </div>
 
-  <!-- Skrypt oblicza точний «цикл» прокрутки: ширина одного лого + gap -->
+  <!-- Скрипт обчислює точний «цикл» прокрутки: ширина одного лого + gap -->
   <script>
     function setMarqueeCycle() {
       const track = document.querySelector('.logo-track');
@@ -220,7 +231,7 @@
         if (color) el.style.setProperty('--color', color);
         if (fw) el.style.setProperty('--fw', fw);
         if (bg) el.style.setProperty('--bg', bg);
-        // wyrównanie jest obsługiwane samym atrybutem data-align w CSS (selektory)
+        // wyrównanie obsługuje atrybut data-align (CSS)
       });
     }
 
@@ -238,12 +249,23 @@
       });
     }
 
-    function formatDuration(msLeft) {
+    function formatDown(msLeft) {
       if (msLeft <= 0) return '0m 00s';
       const totalSec = Math.floor(msLeft / 1000);
       const min = Math.floor(totalSec / 60);
       const sec = totalSec % 60;
       return `${min}m ${String(sec).padStart(2, '0')}s`;
+    }
+
+    // Format w górę: hh:mm:ss (gdy > 59 min) lub mm:ss
+    function formatUp(ms) {
+      if (ms <= 0) return '0:00';
+      const totalSec = Math.floor(ms / 1000);
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      return `${m}:${String(s).padStart(2,'0')}`;
     }
 
     function setStatusClass(el, msLeft) {
@@ -270,6 +292,7 @@
       const elEndLoc    = document.getElementById('tb-end-local');
       const elStatus    = document.getElementById('tb-status');
       const elCountdown = document.getElementById('tb-countdown');
+      const elElapsed   = document.getElementById('tb-elapsed');
 
       // Numer
       const num = Number.parseInt(numStr ?? '', 10);
@@ -287,21 +310,31 @@
         ? `Ważny do: ${toLocalPL(endDt)}`
         : 'Ważny do: —';
 
-      // Status + odliczanie
+      // Liczniki + status
       if (endDt) {
         const update = () => {
-          const msLeft = endDt.getTime() - Date.now();
-          setStatusClass(elStatus, msLeft);
+          const now = Date.now();
 
+          // w dół do końca
+          const msLeft = endDt.getTime() - now;
+          setStatusClass(elStatus, msLeft);
           if (msLeft <= 0) {
             elStatus.textContent = 'Status: bilet wygasł';
             elCountdown.textContent = 'Pozostało: 0m 00s';
           } else if (msLeft <= 2 * 60 * 1000) {
             elStatus.textContent = 'Status: kończy się ważność';
-            elCountdown.textContent = 'Pozostało: ' + formatDuration(msLeft);
+            elCountdown.textContent = 'Pozostało: ' + formatDown(msLeft);
           } else {
             elStatus.textContent = 'Status: bilet ważny';
-            elCountdown.textContent = 'Pozostało: ' + formatDuration(msLeft);
+            elCountdown.textContent = 'Pozostało: ' + formatDown(msLeft);
+          }
+
+          // w górę od skasowania (ts_start)
+          if (startDt) {
+            const msUp = Math.max(0, now - startDt.getTime());
+            elElapsed.textContent = 'Minęło: ' + formatUp(msUp);
+          } else {
+            elElapsed.textContent = 'Minęło: —';
           }
         };
 
@@ -313,16 +346,18 @@
       } else {
         elStatus.textContent = 'Status: —';
         elCountdown.textContent = 'Pozostało: —';
-        setStatusClass(elStatus, -1); // pokaż "bad"
+        elElapsed.textContent = startDt ? 'Minęło: ' + formatUp(Date.now() - startDt.getTime()) : 'Minęło: —';
+        setStatusClass(elStatus, -1);
       }
     }
 
     // Odpal po pełnym załadowaniu (po obrazkach, żeby procenty liczyły się względem końcowych wymiarów)
     window.addEventListener('load', initTicketOverlay);
-    // I aktualizuj po zmianie rozmiaru (pozycje w % działają same, ale gdybyś chciał coś przeliczać – tu miejsce)
+    // I ewentualnie po zmianie rozmiaru – pozycje w % i tak są responsywne
     window.addEventListener('resize', applyTextBlockAttributes);
   </script>
   <!-- === /DODANE === -->
 
 </body>
 </html>
+``
