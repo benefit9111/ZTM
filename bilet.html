@@ -329,13 +329,16 @@
             elCountdown.textContent = 'Pozostało: ' + formatDown(msLeft);
           }
 
-          // w górę od skasowania (ts_start)
-          if (startDt) {
-            const msUp = Math.max(0, now - startDt.getTime());
-            elElapsed.textContent = 'Minęło: ' + formatUp(msUp);
-          } else {
-            elElapsed.textContent = 'Minęło: —';
-          }
+          
+// w górę od skasowania (ts_start)
+if (startDt) {
+  const msUp = Math.max(0, now - startDt.getTime());
+  // używamy TEGO SAMEGO formatu co dla "Pozostało"
+  elElapsed.textContent = 'Minęło: ' + formatDown(msUp);
+} else {
+  elElapsed.textContent = 'Minęło: —';
+}
+
         };
 
         update();
@@ -361,5 +364,6 @@
 </body>
 </html>
 ``
+
 
 
