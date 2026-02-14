@@ -1,63 +1,121 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilet ZTM</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(to right, #667eea 0%, #764ba2 100%); color: white; }
-        #clock { font-size: 48px; margin: 20px 0; }
-        input { font-size: 24px; padding: 10px; border: none; border-radius: 10px; width: 200px; margin: 20px; }
-        button { font-size: 20px; padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 10px; cursor: pointer; }
-        button:hover { background: #45a049; }
-        #output { font-size: 28px; margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bilet ZTM</title>
+  <style>
+    :root{
+      --bg1:#667eea; --bg2:#764ba2; --ok:#4CAF50; --okH:#45a049; --err:#ffcccb;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Arial, Helvetica, sans-serif; color:#fff;
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(to right, var(--bg1) 0%, var(--bg2) 100%);
+      padding:24px;
+    }
+    .card{
+      width:min(720px, 100%); background:rgba(255,255,255,0.12); border-radius:16px;
+      padding:28px; box-shadow:0 10px 30px rgba(0,0,0,0.25); backdrop-filter:blur(4px);
+      text-align:center;
+    }
+    h1{margin:0 0 8px 0}
+    #clock{font-size:40px; margin:10px 0 18px 0}
+    .row{margin-top:14px}
+    input{
+      font-size:22px; padding:12px 14px; width:280px; border:none; border-radius:10px;
+      outline:none;
+    }
+    input.error{background:#fff; border:2px solid #ff6b6b}
+    button{
+      font-size:20px; padding:12px 24px; border:none; border-radius:10px; cursor:pointer;
+      background:var(--ok); color:white; margin-left:10px; min-width:160px;
+    }
+    button:disabled{opacity:.7; cursor:not-allowed}
+    button:hover{background:var(--okH)}
+    #output{font-size:22px; margin-top:16px; min-height:28px}
+    .hint{opacity:.9; font-size:14px; margin-top:6px}
+  </style>
 </head>
 <body>
+  <div class="card">
     <h1>Bilet jednorazowy normalny</h1>
     <div id="clock"></div>
-    <input type="number" id="inputField" placeholder="Numer boczny" />
-    <br>
-    <button onclick="processNumberAndGo()">Kup bilet</button>
+
+    <div class="row">
+      <input type="number" id="inputField" placeholder="Numer boczny" step="1" />
+      <button id="buyBtn" onclick="processNumberAndGo()">Kup bilet</button>
+      <div class="hint">Wpisz numer boczny (liczba całkowita), a następnie kliknij „Kup bilet”.</div>
+    </div>
+
     <div id="output"></div>
+  </div>
 
-    <script>
-        function updateClock() {
-            
-const tsLocal = new Date().toLocaleString('pl-PL', {
-  hour: '2-digit', minute: '2-digit', second: '2-digit',
-  day: '2-digit', month: '2-digit', year: 'numeric'
-});
-url.searchParams.set('ts_local', tsLocal);
+  <script>
+    // Zegar w formacie PL
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleString('pl-PL', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        day: '2-digit', month: '2-digit', year: 'numeric'
+      });
+    }
+    setInterval(updateClock, 1000); updateClock();
 
-            });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+    let pendingRedirect = null;
+    let countdownId = null;
 
-        function processNumberAndGo() {
-            const num = parseFloat(document.getElementById('inputField').value);
-            const output = document.getElementById('output');
-            if (isNaN(num)) {
-                output.innerHTML = 'Nieprawidłowy numer';
-            } else {
-                output.innerHTML = `Numer boczny: ${num}. Przekierowywanie za 3 sek...`;
-                                    
+    function processNumberAndGo() {
+      const inputEl = document.getElementById('inputField');
+      const buyBtn = document.getElementById('buyBtn');
+      const output = document.getElementById('output');
+
+      const raw = inputEl.value.trim();
+      const num = Number.parseInt(raw, 10);
+
+      // Walidacja
+      if (!Number.isFinite(num) || raw === '') {
+        inputEl.classList.add('error');
+        output.textContent = 'Nieprawidłowy numer';
+        return;
+      } else {
+        inputEl.classList.remove('error');
+      }
+
+      if (pendingRedirect) return; // zabezpieczenie przed wielokrotnym kliknięciem
+
+      let seconds = 3;
+      output.textContent = `Numer boczny: ${num}. Przekierowywanie za ${seconds} sek...`;
+      buyBtn.disabled = true;
+
+      if (countdownId) clearInterval(countdownId);
+      countdownId = setInterval(() => {
+        seconds--;
+        output.textContent = `Numer boczny: ${num}. Przekierowywanie za ${seconds} sek...`;
+      }, 1000);
+
       pendingRedirect = setTimeout(() => {
-        clearInterval(intervalId);
-        // Czas przekierowania – ISO UTC (jednoznaczny format)
-        const ts = new Date().toISOString();
+        clearInterval(countdownId);
 
-        // Budujemy URL: num + ts (timestamp)
+        // TERAZ
+        const now = new Date();
+
+        // WYMAGANA KOREKTA:
+        // ts_start = teraz - 1 minuta
+        const tsStart = new Date(now.getTime() - 1 * 60 * 1000);
+
+        // ts_end = teraz + 59 minut
+        const tsEnd = new Date(now.getTime() + 59 * 60 * 1000);
+
         const url = new URL('bilet.html', window.location.href);
         url.searchParams.set('num', String(num));
-        url.searchParams.set('ts', ts); // np. 2026-02-14T09:22:31.512Z
+        url.searchParams.set('ts_start', tsStart.toISOString());
+        url.searchParams.set('ts_end', tsEnd.toISOString());
 
         window.location.href = url.toString();
+      }, 3000);
+    }
 
-                }, 3000);
-            }
-        }
-    </script>
-</body>
-</html>
+    // Enter uruchamia zakup
+    document.getElementById('inputField').addEventListener('keydown', (e) => {
