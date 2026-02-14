@@ -71,7 +71,7 @@
       to   { transform: translate(calc(var(--cycle, 0px) * -1), -50%); }
     }
 
-    /* === DODANE: Overlay i bloki tekstowe (konfigurowalne pozycje) === */
+    /* === Overlay i bloki tekstowe (konfigurowalne pozycje) === */
     .overlay {
       position: absolute;
       inset: 0;        /* pełen obszar biletu */
@@ -99,11 +99,6 @@
     .text-block[data-align="left"]   { transform: translate(0%,   -50%); text-align: left; }
     .text-block[data-align="center"] { transform: translate(-50%, -50%); text-align: center; }
     .text-block[data-align="right"]  { transform: translate(-100%,-50%); text-align: right; }
-
-    /* Opcjonalne warianty statusu (kolor obramowania przez tło wewnętrzne) */
-    .text-block.status-ok   { box-shadow: 0 0 0 3px rgba(53,199,89,0.28) inset; }
-    .text-block.status-warn { box-shadow: 0 0 0 3px rgba(255,204,0,0.35) inset; }
-    .text-block.status-bad  { box-shadow: 0 0 0 3px rgba(255,59,48,0.35) inset; }
   </style>
 </head>
 <body>
@@ -113,7 +108,7 @@
       <!-- ФОН -->
       <img src="ztm.png" alt="tło biletu" class="bg">
 
-      <!-- АНІМАЦІЯ ЛОГОТИПУ (безшовно, зліва → направо) -->
+      <!-- АНІМАЦІЯ ЛОГОТИПУ (bezszwowo, z lewej → w prawo) -->
       <div class="logo-stage">
         <div class="logo-track">
           <img src="logo_ztm.png" alt="logo" />
@@ -121,7 +116,7 @@
         </div>
       </div>
 
-      <!-- === DODANE: Nakładka z blokami tekstowymi (pozycje ustawiasz atrybutami data-*) === -->
+      <!-- Nakładka z blokami tekstowymi (pozycje ustawiasz atrybutami data-*) -->
       <div class="overlay" id="overlay">
         <!-- Numer boczny -->
         <div
@@ -134,62 +129,52 @@
           data-fw="700"
         >Numer: —</div>
 
-        <!-- Start lokalny -->
+        <!-- Start lokalny (format: rrrr.mm.dd, godz:min:sec) -->
         <div
           class="text-block"
           id="tb-start-local"
           data-x="8%" data-y="25%"
           data-align="left"
-          data-fs="1.6vw"
+          data-fs="16.3px"
+          data-color="#000"
         >Start: —</div>
 
-        <!-- Koniec lokalny -->
+        <!-- Koniec lokalny (format: rrrr.mm.dd, godz:min:sec) -->
         <div
           class="text-block"
           id="tb-end-local"
           data-x="92%" data-y="25%"
           data-align="right"
-          data-fs="1.6vw"
+          data-fs="16.3px"
+          data-color="#000"
         >Ważny do: —</div>
-
-        <!-- Status -->
-        <div
-          class="text-block"
-          id="tb-status"
-          data-x="50%" data-y="78%"
-          data-align="center"
-          data-fs="2.0vw"
-          data-bg="rgba(255,255,255,0.65)"
-          data-fw="700"
-        >Status: —</div>
 
         <!-- Odliczanie do końca -->
         <div
           class="text-block"
           id="tb-countdown"
-          data-x="50%" data-y="86%"
+          data-x="50%" data-y="84%"
           data-align="center"
           data-fs="2.2vw"
           data-fw="800"
         >Pozostało: —</div>
 
-        <!-- === NOWE: Czas od skasowania (licznik w górę) === -->
+        <!-- Czas od skasowania (licznik w górę, taki sam styl jak Pozostało: m i s) -->
         <div
           class="text-block"
           id="tb-elapsed"
           data-x="8%" data-y="32%"
           data-align="left"
-          data-fs="1.6vw"
-          data-color="#111"
+          data-fs="16.3px"
+          data-color="#000"
           data-fw="700"
         >Minęło: —</div>
       </div>
-      <!-- === /DODANE === -->
 
     </div>
   </div>
 
-  <!-- Скрипт обчислює точний «цикл» прокрутки: ширина одного лого + gap -->
+  <!-- Skrypt oblicza dokładny „cykl” przesuwu: szerokość jednego logo + gap -->
   <script>
     function setMarqueeCycle() {
       const track = document.querySelector('.logo-track');
@@ -198,28 +183,27 @@
       const firstImg = track.querySelector('img');
       if (!firstImg) return;
 
-      // Поточні стилі (щоб взяти фактичний gap)
+      // Bieżące style (gap)
       const st   = getComputedStyle(track);
       const gap  = parseFloat(st.columnGap || st.gap) || 0;
 
-      // Фактична ширина першого лого (з урахуванням поточного рендеру)
+      // Faktyczna szerokość pierwszego logo
       const w = firstImg.getBoundingClientRect().width;
 
-      // Цикл = ширина одного лого + gap
+      // Cykl = szerokość jednego logo + gap
       const cycle = Math.ceil(w + gap);
 
-      // Прокидаємо в CSS як змінну
+      // Przekazanie do CSS jako zmienna
       track.style.setProperty('--cycle', cycle + 'px');
     }
 
-    // Рахуємо після повного завантаження (картинки теж), та при зміні розміру
     window.addEventListener('load', () => {
       setMarqueeCycle();
       window.addEventListener('resize', setMarqueeCycle);
     });
   </script>
 
-  <!-- === DODANE: Skrypt do bloków tekstowych i odczytu parametrów === -->
+  <!-- Skrypt do bloków tekstowych i odczytu parametrów -->
   <script>
     // Ustawienie pozycji i stylu bloków na podstawie atrybutów data-*
     function applyTextBlockAttributes() {
@@ -242,41 +226,24 @@
       return Number.isNaN(ms) ? null : new Date(ms);
     }
 
-    function toLocalPL(dt) {
-      return dt.toLocaleString('pl-PL', {
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-        day: '2-digit', month: '2-digit', year: 'numeric'
-      });
+    // Format: rrrr.mm.dd, godz:min:sec (np. 2026.02.14, 09:42:07)
+    function formatDatePLCompact(dt) {
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const d = String(dt.getDate()).padStart(2, '0');
+      const hh = String(dt.getHours()).padStart(2, '0');
+      const mm = String(dt.getMinutes()).padStart(2, '0');
+      const ss = String(dt.getSeconds()).padStart(2, '0');
+      return `${y}.${m}.${d}, ${hh}:${mm}:${ss}`;
     }
 
-    function formatDown(msLeft) {
-      if (msLeft <= 0) return '0m 00s';
-      const totalSec = Math.floor(msLeft / 1000);
+    // Wspólny format m i s (np. 12m 07s), używany dla „Pozostało” i „Minęło”
+    function formatMinutesSeconds(ms) {
+      if (ms <= 0) return '0m 00s';
+      const totalSec = Math.floor(ms / 1000);
       const min = Math.floor(totalSec / 60);
       const sec = totalSec % 60;
       return `${min}m ${String(sec).padStart(2, '0')}s`;
-    }
-
-    // Format w górę: hh:mm:ss (gdy > 59 min) lub mm:ss
-    function formatUp(ms) {
-      if (ms <= 0) return '0:00';
-      const totalSec = Math.floor(ms / 1000);
-      const h = Math.floor(totalSec / 3600);
-      const m = Math.floor((totalSec % 3600) / 60);
-      const s = totalSec % 60;
-      if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      return `${m}:${String(s).padStart(2,'0')}`;
-    }
-
-    function setStatusClass(el, msLeft) {
-      el.classList.remove('status-ok', 'status-warn', 'status-bad');
-      if (msLeft <= 0) {
-        el.classList.add('status-bad');
-      } else if (msLeft <= 2 * 60 * 1000) {
-        el.classList.add('status-warn');
-      } else {
-        el.classList.add('status-ok');
-      }
     }
 
     function initTicketOverlay() {
@@ -290,7 +257,6 @@
       const elNum       = document.getElementById('tb-num');
       const elStartLoc  = document.getElementById('tb-start-local');
       const elEndLoc    = document.getElementById('tb-end-local');
-      const elStatus    = document.getElementById('tb-status');
       const elCountdown = document.getElementById('tb-countdown');
       const elElapsed   = document.getElementById('tb-elapsed');
 
@@ -303,67 +269,4 @@
       const endDt   = parseIso(tsEndStr);
 
       elStartLoc.textContent = startDt
-        ? `Start: ${toLocalPL(startDt)}`
-        : 'Start: —';
-
-      elEndLoc.textContent = endDt
-        ? `Ważny do: ${toLocalPL(endDt)}`
-        : 'Ważny do: —';
-
-      // Liczniki + status
-      if (endDt) {
-        const update = () => {
-          const now = Date.now();
-
-          // w dół do końca
-          const msLeft = endDt.getTime() - now;
-          setStatusClass(elStatus, msLeft);
-          if (msLeft <= 0) {
-            elStatus.textContent = 'Status: bilet wygasł';
-            elCountdown.textContent = 'Pozostało: 0m 00s';
-          } else if (msLeft <= 2 * 60 * 1000) {
-            elStatus.textContent = 'Status: kończy się ważność';
-            elCountdown.textContent = 'Pozostało: ' + formatDown(msLeft);
-          } else {
-            elStatus.textContent = 'Status: bilet ważny';
-            elCountdown.textContent = 'Pozostało: ' + formatDown(msLeft);
-          }
-
-          
-// w górę od skasowania (ts_start)
-if (startDt) {
-  const msUp = Math.max(0, now - startDt.getTime());
-  // używamy TEGO SAMEGO formatu co dla "Pozostało"
-  elElapsed.textContent = 'Minęło: ' + formatDown(msUp);
-} else {
-  elElapsed.textContent = 'Minęło: —';
-}
-
-        };
-
-        update();
-        const timerId = setInterval(() => {
-          update();
-          if (Date.now() >= endDt.getTime()) clearInterval(timerId);
-        }, 1000);
-      } else {
-        elStatus.textContent = 'Status: —';
-        elCountdown.textContent = 'Pozostało: —';
-        elElapsed.textContent = startDt ? 'Minęło: ' + formatUp(Date.now() - startDt.getTime()) : 'Minęło: —';
-        setStatusClass(elStatus, -1);
-      }
-    }
-
-    // Odpal po pełnym załadowaniu (po obrazkach, żeby procenty liczyły się względem końcowych wymiarów)
-    window.addEventListener('load', initTicketOverlay);
-    // I ewentualnie po zmianie rozmiaru – pozycje w % i tak są responsywne
-    window.addEventListener('resize', applyTextBlockAttributes);
-  </script>
-  <!-- === /DODANE === -->
-
-</body>
-</html>
-``
-
-
-
+        ? `Start: ${formatDatePLCompact(startDt)}`
