@@ -263,9 +263,13 @@
       const elCountdown = document.getElementById('tb-countdown');
       const elElapsed   = document.getElementById('tb-elapsed');
 
-      // Numer
-      const num = Number.parseInt(numStr ?? '', 10);
-      if (elNum) elNum.textContent = Number.isFinite(num) ? `Numer: ${num}` : 'Numer: —';
+      
+// Numer
+const num = Number.parseInt(numStr ?? '', 10);
+if (elNum) {
+  elNum.textContent = Number.isFinite(num) ? String(num) : '—';
+}
+
 
       // Czas
       const startDt = parseIso(tsStartStr);
@@ -286,7 +290,7 @@
 
           // w dół do końca
           const msLeft = endDt.getTime() - now;
-          if (elCountdown) elCountdown.textContent = 'Pozostało: ' + formatMinutesSeconds(msLeft);
+          if (elCountdown) elCountdown.textContent = formatMinutesSeconds(msLeft);
 
           // w górę od skasowania (ts_start), ten sam format m i s
           if (startDt && elElapsed) {
@@ -322,4 +326,5 @@
   </script>
 </body>
 </html>
+
 
