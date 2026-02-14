@@ -8,64 +8,64 @@
     html, body {
       margin: 0;
       padding: 0;
-      overflow-x: hidden;      /* без горизонтального скролу */
-      background: #eaeaea;     /* фон навколо квитка */
+      overflow-x: hidden;      /* bez poziomego scrollu */
+      background: #eaeaea;     /* tło wokół biletu */
       font-family: "Carlito", Arial, sans-serif;
     }
 
-    /* Центруємо макет на екрані */
+    /* Centrowanie makiety na ekranie */
     .page {
       display: flex;
       justify-content: center;
     }
 
-    /* Контейнер сторінки-квитка */
+    /* Kontener strony-biletu */
     .ticket {
-      position: relative;      /* базовий контекст для абсолютного позиціювання .logo-stage */
+      position: relative;      /* kontekst dla absolutnych pozycji (logo, overlay) */
       display: inline-block;
       line-height: 0;
       user-select: none;
     }
 
-    /* Фон як <img> (тягнеться на 100% ширини контейнера) */
+    /* Tło jako <img> (rozciąga się do 100% szerokości kontenera) */
     .ticket img.bg {
       display: block;
       width: 100%;
       height: auto;
     }
 
-    /* СЦЕНА анімації: поверх фону, позиції у % від фону */
+    /* SCENA animacji: nad tłem, pozycje w % względem tła */
     .logo-stage {
       position: absolute;
-      top: 28%;            /* позиція по вертикалі від висоти фону */
+      top: 28%;            /* pionowo względem wysokości tła */
       left: 5.4%;
       width: 89%;
       height: 47px;
-      overflow: hidden;    /* обрізаємо за межами сцени */
+      overflow: hidden;    /* obcięcie spoza sceny */
       pointer-events: none;
       z-index: 1;
     }
 
-    /* СТРІЧКА (дві копії логотипу підряд для безшовності) */
+    /* Taśma (dwie kopie logo dla bezszwowości) */
     .logo-track {
       position: absolute;
       top: 50%;
       display: flex;
       align-items: center;
-      gap: 245px;                                /* за потреби можеш поставити, наприклад, 90px */
-      transform: translateY(-50%);             /* центрування по Y */
+      gap: 245px;                                /* w razie potrzeby zmień np. na 90px */
+      transform: translateY(-50%);               /* centrowanie po Y */
       animation: marqueeCycle var(--duration, 10s) linear infinite;
-      animation-direction: reverse;            /* зліва → направо */
+      animation-direction: reverse;              /* z lewej → w prawo */
       will-change: transform;
     }
 
     .logo-track img {
-      height: 37px;         /* висота логотипу */
+      height: 37px;         /* wysokość logotypu */
       flex: 0 0 auto;
       display: block;
     }
 
-    /* Анімація: зсув рівно на ширину одного лого + gap (встановлюється з JS у --cycle) */
+    /* Animacja: przesunięcie o dokładny „cykl” (szerokość logo + gap) – cykl ustawiany w JS do --cycle */
     @keyframes marqueeCycle {
       from { transform: translate(0, -50%); }
       to   { transform: translate(calc(var(--cycle, 0px) * -1), -50%); }
@@ -74,14 +74,15 @@
     /* === Overlay i bloki tekstowe (konfigurowalne pozycje) === */
     .overlay {
       position: absolute;
-      inset: 0;        /* pełen obszar biletu */
+      inset: 0;        /* pełen obszar tła */
       z-index: 2;      /* nad animacją logo */
       pointer-events: none;
       line-height: 1.2;
     }
+
     .text-block {
       position: absolute;
-      /* Pozycje będą nadawane z atrybutów data-x / data-y (w %) */
+      /* Pozycje nadawane z atrybutów data-x / data-y (w %) → mapowane na zmienne CSS */
       top: var(--y, 0%);
       left: var(--x, 0%);
       /* Punkt odniesienia (anchor) zależny od data-align: */
@@ -95,7 +96,7 @@
       white-space: nowrap;
       text-shadow: 0 1px 0 rgba(255,255,255,0.4);
     }
-    /* Wyrównanie – zmieniamy transform X przez atrybut data-align */
+    /* Wyrównanie – zmiana transform poprzez atrybut data-align */
     .text-block[data-align="left"]   { transform: translate(0%,   -50%); text-align: left; }
     .text-block[data-align="center"] { transform: translate(-50%, -50%); text-align: center; }
     .text-block[data-align="right"]  { transform: translate(-100%,-50%); text-align: right; }
@@ -105,10 +106,10 @@
 
   <div class="page">
     <div class="ticket">
-      <!-- ФОН -->
+      <!-- TŁO -->
       <img src="ztm.png" alt="tło biletu" class="bg">
 
-      <!-- АНІМАЦІЯ ЛОГОТИПУ (bezszwowo, z lewej → w prawo) -->
+      <!-- ANIMACJA LOGO (bezszwowo, z lewej → w prawo) -->
       <div class="logo-stage">
         <div class="logo-track">
           <img src="logo_ztm.png" alt="logo" />
@@ -129,7 +130,7 @@
           data-fw="700"
         >Numer: —</div>
 
-        <!-- Start lokalny (format: rrrr.mm.dd, godz:min:sec) -->
+        <!-- Start lokalny (format: rrrr.mm.dd, hh:mm:ss) -->
         <div
           class="text-block"
           id="tb-start-local"
@@ -139,7 +140,7 @@
           data-color="#000"
         >Start: —</div>
 
-        <!-- Koniec lokalny (format: rrrr.mm.dd, godz:min:sec) -->
+        <!-- Koniec lokalny (format: rrrr.mm.dd, hh:mm:ss) -->
         <div
           class="text-block"
           id="tb-end-local"
@@ -159,7 +160,7 @@
           data-fw="800"
         >Pozostało: —</div>
 
-        <!-- Czas od skasowania (licznik w górę, taki sam styl jak Pozostało: m i s) -->
+        <!-- Czas od skasowania (licznik w górę, ten sam format m i s) -->
         <div
           class="text-block"
           id="tb-elapsed"
@@ -197,6 +198,7 @@
       track.style.setProperty('--cycle', cycle + 'px');
     }
 
+    // Ustaw po przeliczeniu layoutu (po obrazkach) i reaguj na zmianę rozmiaru
     window.addEventListener('load', () => {
       setMarqueeCycle();
       window.addEventListener('resize', setMarqueeCycle);
@@ -226,7 +228,7 @@
       return Number.isNaN(ms) ? null : new Date(ms);
     }
 
-    // Format: rrrr.mm.dd, godz:min:sec (np. 2026.02.14, 09:42:07)
+    // Format: rrrr.mm.dd, hh:mm:ss (np. 2026.02.14, 09:42:07)
     function formatDatePLCompact(dt) {
       const y = dt.getFullYear();
       const m = String(dt.getMonth() + 1).padStart(2, '0');
@@ -237,7 +239,7 @@
       return `${y}.${m}.${d}, ${hh}:${mm}:${ss}`;
     }
 
-    // Wspólny format m i s (np. 12m 07s), używany dla „Pozostało” i „Minęło”
+    // Wspólny format m i s (np. 12m 07s)
     function formatMinutesSeconds(ms) {
       if (ms <= 0) return '0m 00s';
       const totalSec = Math.floor(ms / 1000);
@@ -247,7 +249,8 @@
     }
 
     function initTicketOverlay() {
-      applyTextBlockAttributes();
+      // Ustaw pozycje jak najszybciej
+      try { applyTextBlockAttributes(); } catch (e) { console.error(e); }
 
       const params = new URLSearchParams(window.location.search);
       const numStr     = params.get('num');
@@ -262,11 +265,60 @@
 
       // Numer
       const num = Number.parseInt(numStr ?? '', 10);
-      elNum.textContent = Number.isFinite(num) ? `Numer: ${num}` : 'Numer: —';
+      if (elNum) elNum.textContent = Number.isFinite(num) ? `Numer: ${num}` : 'Numer: —';
 
       // Czas
       const startDt = parseIso(tsStartStr);
       const endDt   = parseIso(tsEndStr);
 
-      elStartLoc.textContent = startDt
+      if (elStartLoc) elStartLoc.textContent = startDt
         ? `Start: ${formatDatePLCompact(startDt)}`
+        : 'Start: —';
+
+      if (elEndLoc) elEndLoc.textContent = endDt
+        ? `Ważny do: ${formatDatePLCompact(endDt)}`
+        : 'Ważny do: —';
+
+      // Liczniki
+      if (endDt) {
+        const update = () => {
+          const now = Date.now();
+
+          // w dół do końca
+          const msLeft = endDt.getTime() - now;
+          if (elCountdown) elCountdown.textContent = 'Pozostało: ' + formatMinutesSeconds(msLeft);
+
+          // w górę od skasowania (ts_start), ten sam format m i s
+          if (startDt && elElapsed) {
+            const msUp = Math.max(0, now - startDt.getTime());
+            elElapsed.textContent = 'Minęło: ' + formatMinutesSeconds(msUp);
+          } else if (elElapsed) {
+            elElapsed.textContent = 'Minęło: —';
+          }
+        };
+
+        update();
+        const timerId = setInterval(() => {
+          update();
+          if (Date.now() >= endDt.getTime()) clearInterval(timerId);
+        }, 1000);
+      } else {
+        if (elCountdown) elCountdown.textContent = 'Pozostało: —';
+        if (elElapsed)   elElapsed.textContent   =
+          startDt ? ('Minęło: ' + formatMinutesSeconds(Date.now() - startDt.getTime())) : 'Minęło: —';
+      }
+    }
+
+    // Ustaw pozycje już po zbudowaniu DOM (bez czekania na obrazki)
+    document.addEventListener('DOMContentLoaded', () => {
+      try { applyTextBlockAttributes(); } catch (e) { console.error(e); }
+    });
+
+    // Główna logika biletu po pełnym załadowaniu (gdy obrazek ma już finalne wymiary)
+    window.addEventListener('load', initTicketOverlay);
+
+    // Aktualizacja (na wszelki wypadek) po zmianie rozmiaru
+    window.addEventListener('resize', applyTextBlockAttributes);
+  </script>
+</body>
+</html>
