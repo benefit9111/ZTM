@@ -54,19 +54,18 @@
       display: flex;
       align-items: center;
       gap: 245px;                                /* w razie potrzeby zmień np. na 90px */
-      transform: translateY(-50%);               /* centrowanie po Y */
+      transform: translateY(-50%);
       animation: marqueeCycle var(--duration, 10s) linear infinite;
       animation-direction: reverse;              /* z lewej → w prawo */
       will-change: transform;
     }
 
     .logo-track img {
-      height: 37px;         /* wysokość logotypu */
+      height: 37px;
       flex: 0 0 auto;
       display: block;
     }
 
-    /* Animacja: przesunięcie o dokładny „cykl” (szerokość logo + gap) – cykl ustawiany w JS do --cycle */
     @keyframes marqueeCycle {
       from { transform: translate(0, -50%); }
       to   { transform: translate(calc(var(--cycle, 0px) * -1), -50%); }
@@ -83,10 +82,8 @@
 
     .text-block {
       position: absolute;
-      /* Pozycje nadawane z atrybutów data-x / data-y (w %) → mapowane na zmienne CSS */
       top: var(--y, 0%);
       left: var(--x, 0%);
-      /* Punkt odniesienia (anchor) zależny od data-align: */
       transform: translate(-50%, -50%); /* domyślnie center */
       font-size: clamp(10px, var(--fs, 1.8vw), 26px);
       color: var(--color, #000);
@@ -97,7 +94,6 @@
       white-space: nowrap;
       text-shadow: 0 1px 0 rgba(255,255,255,0.4);
     }
-    /* Wyrównanie – zmiana transform poprzez atrybut data-align */
     .text-block[data-align="left"]   { transform: translate(0%,   -50%); text-align: left; }
     .text-block[data-align="center"] { transform: translate(-50%, -50%); text-align: center; }
     .text-block[data-align="right"]  { transform: translate(-100%,-50%); text-align: right; }
@@ -110,7 +106,7 @@
       <!-- TŁO -->
       <img src="ztm.png" alt="tło biletu" class="bg">
 
-      <!-- ANIMACJA LOGO (bezszwowo, z lewej → w prawo) -->
+      <!-- ANIMACJA LOGO -->
       <div class="logo-stage">
         <div class="logo-track">
           <img src="logo_ztm.png" alt="logo" />
@@ -120,7 +116,6 @@
 
       <!-- Nakładka z blokami tekstowymi (pozycje ustawiasz atrybutami data-*) -->
       <div class="overlay" id="overlay">
-
 
         <!-- Odliczanie do końca -->
         <div
@@ -132,41 +127,41 @@
           data-fw="800"
           data-color="#2b7729"
         >—</div>
-        
-        <!-- Data zakupu -->
+
+        <!-- Data zakupu (używa czasu startu) -->
         <div
-          class="text-block"
-          id="tb-start-local"
+          class="text-block js-start-time"
+          id="tb-purchase-time"
           data-x="8%" data-y="43.2%"
           data-align="left"
           data-fs="4.9vw"
           data-color="#000"
         >—</div>
-        
-       <!-- Wazny od -->
+
+        <!-- Ważny od (używa czasu startu) -->
         <div
-          class="text-block"
-          id="tb-start-local"
+          class="text-block js-start-time"
+          id="tb-valid-from"
           data-x="8%" data-y="47.2%"
           data-align="left"
           data-fs="4.9vw"
           data-color="#000"
         >—</div>
 
-        <!-- Wazny do -->
+        <!-- Ważny do (używa czasu końca) -->
         <div
-          class="text-block"
-          id="tb-end-local"
+          class="text-block js-valid-to"
+          id="tb-valid-to"
           data-x="8%" data-y="51.2%"
           data-align="left"
           data-fs="4.9vw"
           data-color="#000"
         >—</div>
 
-         <!-- Data skasowania biletu -->
+        <!-- Data skasowania biletu (używa czasu startu) -->
         <div
-          class="text-block"
-          id="tb-start-local"
+          class="text-block js-start-time"
+          id="tb-cancel-time"
           data-x="8%" data-y="55.2%"
           data-align="left"
           data-fs="4.9vw"
@@ -184,7 +179,7 @@
           data-fw="700"
         >—</div>
 
-    <!-- Numer boczny -->
+        <!-- Numer boczny -->
         <div
           class="text-block"
           id="tb-num"
@@ -194,13 +189,12 @@
           data-color="#000"
           data-fw="700"
         >—</div>
-        
-      </div>
 
+      </div>
     </div>
   </div>
 
-  <!-- Skrypt oblicza dokładny „cykl” przesuwu: szerokość jednego logo + gap -->
+  <!-- Skrypt oblicza dokładny „cykl” przesuwu -->
   <script>
     function setMarqueeCycle() {
       const track = document.querySelector('.logo-track');
@@ -209,21 +203,13 @@
       const firstImg = track.querySelector('img');
       if (!firstImg) return;
 
-      // Bieżące style (gap)
       const st   = getComputedStyle(track);
       const gap  = parseFloat(st.columnGap || st.gap) || 0;
-
-      // Faktyczna szerokość pierwszego logo
-      const w = firstImg.getBoundingClientRect().width;
-
-      // Cykl = szerokość jednego logo + gap
+      const w    = firstImg.getBoundingClientRect().width;
       const cycle = Math.ceil(w + gap);
-
-      // Przekazanie do CSS jako zmienna
       track.style.setProperty('--cycle', cycle + 'px');
     }
 
-    // Ustaw po przeliczeniu layoutu (po obrazkach) i reaguj na zmianę rozmiaru
     window.addEventListener('load', () => {
       setMarqueeCycle();
       window.addEventListener('resize', setMarqueeCycle);
@@ -232,28 +218,32 @@
 
   <!-- Skrypt do bloków tekstowych i odczytu parametrów -->
   <script>
-    // Ustawienie pozycji i stylu bloków na podstawie atrybutów data-*
+    /* ========= GLOBALNE ZMIENNE ========= */
+    let startMs = null;
+    let endMs   = null;
+
     function applyTextBlockAttributes() {
       document.querySelectorAll('.text-block').forEach(el => {
-        const { x, y, fs, color, fw, bg } = el.dataset;
+        const norm = v => (typeof v === 'string' ? v.replace(',', '.') : v);
+        let { x, y, fs, color, fw, bg } = el.dataset;
+        x  = norm(x);
+        y  = norm(y);
+        fs = norm(fs);
         if (x) el.style.setProperty('--x', x);
         if (y) el.style.setProperty('--y', y);
         if (fs) el.style.setProperty('--fs', fs);
         if (color) el.style.setProperty('--color', color);
         if (fw) el.style.setProperty('--fw', fw);
         if (bg) el.style.setProperty('--bg', bg);
-        // wyrównanie obsługuje atrybut data-align (CSS)
       });
     }
 
-    // Parsowanie ISO -> Date z walidacją
     function parseIso(iso) {
       if (!iso) return null;
       const ms = Date.parse(iso);
       return Number.isNaN(ms) ? null : new Date(ms);
     }
 
-    // Format: rrrr.mm.dd, hh:mm:ss (np. 2026.02.14, 09:42:07)
     function formatDatePLCompact(dt) {
       const y = dt.getFullYear();
       const m = String(dt.getMonth() + 1).padStart(2, '0');
@@ -264,7 +254,6 @@
       return `${y}.${m}.${d}, ${hh}:${mm}:${ss}`;
     }
 
-    // Wspólny format m i s (np. 12m 07s)
     function formatMinutesSeconds(ms) {
       if (ms <= 0) return '0m 00s';
       const totalSec = Math.floor(ms / 1000);
@@ -283,43 +272,41 @@
       const tsEndStr   = params.get('ts_end');   // ISO: teraz + 59 min (ustawiane w index.html)
 
       const elNum       = document.getElementById('tb-num');
-      const elStartLoc  = document.getElementById('tb-start-local');
-      const elEndLoc    = document.getElementById('tb-end-local');
       const elCountdown = document.getElementById('tb-countdown');
       const elElapsed   = document.getElementById('tb-elapsed');
 
-      
-// Numer
-const num = Number.parseInt(numStr ?? '', 10);
-if (elNum) {
-  elNum.textContent = Number.isFinite(num) ? String(num) : '—';
-}
+      // Numer
+      const num = Number.parseInt(numStr ?? '', 10);
+      if (elNum) elNum.textContent = Number.isFinite(num) ? String(num) : '—';
 
-
-      // Czas
+      // Parsowanie czasów → zapis globalnie (ms)
       const startDt = parseIso(tsStartStr);
       const endDt   = parseIso(tsEndStr);
+      startMs = startDt ? startDt.getTime() : null;
+      endMs   = endDt   ? endDt.getTime()   : null;
 
-      if (elStartLoc) elStartLoc.textContent = startDt
-        ? `${formatDatePLCompact(startDt)}`
-        : '—';
+      // Wstaw czas startu we WSZYSTKIE miejsca oznaczone .js-start-time
+      document.querySelectorAll('.js-start-time').forEach(el => {
+        el.textContent = startMs ? formatDatePLCompact(new Date(startMs)) : '—';
+      });
 
-      if (elEndLoc) elEndLoc.textContent = endDt
-        ? `${formatDatePLCompact(endDt)}`
-        : '—';
+      // Wstaw czas końca we WSZYSTKIE miejsca oznaczone .js-valid-to
+      document.querySelectorAll('.js-valid-to').forEach(el => {
+        el.textContent = endMs ? formatDatePLCompact(new Date(endMs)) : '—';
+      });
 
       // Liczniki
-      if (endDt) {
+      if (endMs) {
         const update = () => {
           const now = Date.now();
 
           // w dół do końca
-          const msLeft = endDt.getTime() - now;
+          const msLeft = endMs - now;
           if (elCountdown) elCountdown.textContent = formatMinutesSeconds(msLeft);
 
-          // w górę od skasowania (ts_start), ten sam format m i s
-          if (startDt && elElapsed) {
-            const msUp = Math.max(0, now - startDt.getTime());
+          // w górę od skasowania (ts_start)
+          if (startMs && elElapsed) {
+            const msUp = Math.max(0, now - startMs);
             elElapsed.textContent = formatMinutesSeconds(msUp);
           } else if (elElapsed) {
             elElapsed.textContent = '—';
@@ -329,40 +316,25 @@ if (elNum) {
         update();
         const timerId = setInterval(() => {
           update();
-          if (Date.now() >= endDt.getTime()) clearInterval(timerId);
+          if (Date.now() >= endMs) clearInterval(timerId);
         }, 1000);
       } else {
-        if (elCountdown) elCountdown.textContent = 'Pozostało: —';
+        if (elCountdown) elCountdown.textContent = '—';
         if (elElapsed)   elElapsed.textContent   =
-          startDt ? ('Minęło: ' + formatMinutesSeconds(Date.now() - startDt.getTime())) : '—';
+          startMs ? formatMinutesSeconds(Date.now() - startMs) : '—';
       }
     }
 
-    // Ustaw pozycje już po zbudowaniu DOM (bez czekania na obrazki)
+    // Ustaw pozycje już po zbudowaniu DOM
     document.addEventListener('DOMContentLoaded', () => {
       try { applyTextBlockAttributes(); } catch (e) { console.error(e); }
     });
 
-    // Główna logika biletu po pełnym załadowaniu (gdy obrazek ma już finalne wymiary)
+    // Główna logika biletu po załadowaniu obrazka (finalne wymiary)
     window.addEventListener('load', initTicketOverlay);
 
-    // Aktualizacja (na wszelki wypadek) po zmianie rozmiaru
+    // Aktualizacja (na wszelki wypadek) po resize
     window.addEventListener('resize', applyTextBlockAttributes);
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
