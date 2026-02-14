@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Простий годинник та поле</title>
+    <title>Bilet ZTM</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(to right, #667eea 0%, #764ba2 100%); color: white; }
         #clock { font-size: 48px; margin: 20px 0; }
@@ -16,7 +16,7 @@
 <body>
     <h1>Bilet jednorazowy normalny</h1>
     <div id="clock"></div>
-    <input type="number" id="inputField" placeholder="Numer boczny pojazdu" />
+    <input type="number" id="inputField" placeholder="Numer boczny" />
     <br>
     <button onclick="processNumberAndGo()">Kup bilet</button>
     <div id="output"></div>
@@ -24,7 +24,7 @@
     <script>
         function updateClock() {
             const now = new Date();
-            document.getElementById('clock').innerHTML = now.toLocaleString('uk-UA', { 
+            document.getElementById('clock').innerHTML = now.toLocaleString('pl-PL', { 
                 hour: '2-digit', minute: '2-digit', second: '2-digit',
                 day: '2-digit', month: '2-digit', year: 'numeric'
             });
@@ -36,12 +36,12 @@
             const num = parseFloat(document.getElementById('inputField').value);
             const output = document.getElementById('output');
             if (isNaN(num)) {
-                output.innerHTML = 'Будь ласка, введи валідне число!';
+                output.innerHTML = 'Nieprawidłowy numer';
             } else {
-                output.innerHTML = `Ти ввів: ${num}. Квадрат: ${num * num}. Перехід за 2 сек...`;
+                output.innerHTML = `Numer boczny: ${num}. Przekierowywanie za 3 sek...`;
                 setTimeout(() => {
-                    window.location.href = 'bilet.html?price=' + num;  // Передаємо число
-                }, 2000);
+                    window.location.href = 'bilet.html?price=' + num;  // Przekazujemy numer
+                }, 3000);
             }
         }
     </script>
