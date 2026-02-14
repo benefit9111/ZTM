@@ -135,21 +135,21 @@
         <div
           class="text-block"
           id="tb-start-local"
-          data-x="8%" data-y="25%"
+          data-x="8%" data-y="30%"
           data-align="left"
           data-fs="5.0vw"
           data-color="#000"
-        >Start: —</div>
+        >—</div>
 
         <!-- Koniec lokalny (format: rrrr.mm.dd, hh:mm:ss) -->
         <div
           class="text-block"
           id="tb-end-local"
-          data-x="92%" data-y="25%"
+          data-x="8%" data-y="35%"
           data-align="right"
           data-fs="5.0vw"
           data-color="#000"
-        >Ważny do: —</div>
+        >—</div>
 
         <!-- Odliczanie do końca -->
         <div
@@ -278,12 +278,12 @@ if (elNum) {
       const endDt   = parseIso(tsEndStr);
 
       if (elStartLoc) elStartLoc.textContent = startDt
-        ? `Start: ${formatDatePLCompact(startDt)}`
-        : 'Start: —';
+        ? `${formatDatePLCompact(startDt)}`
+        : '—';
 
       if (elEndLoc) elEndLoc.textContent = endDt
-        ? `Ważny do: ${formatDatePLCompact(endDt)}`
-        : 'Ważny do: —';
+        ? `${formatDatePLCompact(endDt)}`
+        : '—';
 
       // Liczniki
       if (endDt) {
@@ -297,9 +297,9 @@ if (elNum) {
           // w górę od skasowania (ts_start), ten sam format m i s
           if (startDt && elElapsed) {
             const msUp = Math.max(0, now - startDt.getTime());
-            elElapsed.textContent = 'Minęło: ' + formatMinutesSeconds(msUp);
+            elElapsed.textContent = formatMinutesSeconds(msUp);
           } else if (elElapsed) {
-            elElapsed.textContent = 'Minęło: —';
+            elElapsed.textContent = '—';
           }
         };
 
@@ -311,7 +311,7 @@ if (elNum) {
       } else {
         if (elCountdown) elCountdown.textContent = 'Pozostało: —';
         if (elElapsed)   elElapsed.textContent   =
-          startDt ? ('Minęło: ' + formatMinutesSeconds(Date.now() - startDt.getTime())) : 'Minęło: —';
+          startDt ? ('Minęło: ' + formatMinutesSeconds(Date.now() - startDt.getTime())) : '—';
       }
     }
 
@@ -328,6 +328,7 @@ if (elNum) {
   </script>
 </body>
 </html>
+
 
 
 
